@@ -79,7 +79,7 @@ status_t ALSAStreamOps::set(int      *format,
                             uint32_t *rate)
 {
 
-   LOGE("Stream set");
+   ALOGE("Stream set");
 
     status_t status = NO_ERROR;
     if (channels && *channels != 0) {
@@ -141,7 +141,7 @@ status_t ALSAStreamOps::set(int      *format,
                 break;
 
             default:
-                LOGE("Unknown PCM format %i. Forcing default", *format);
+                ALOGE("Unknown PCM format %i. Forcing default", *format);
                 break;
         }
 
@@ -171,7 +171,7 @@ status_t ALSAStreamOps::set(int      *format,
         if (mParent->mALSADevice->resetDefaults) {
             status = mParent->mALSADevice->resetDefaults(mHandle);
             if (status != NO_ERROR) {
-                LOGE("reset defaults return failure");
+                ALOGE("reset defaults return failure");
                 return BAD_VALUE;
             }
         }
@@ -187,7 +187,7 @@ status_t ALSAStreamOps::setParameters(const String8& keyValuePairs)
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    LOGV("setParameters() %s", keyValuePairs.string());
+    ALOGV("setParameters() %s", keyValuePairs.string());
     String8 keyfm = String8("fm_off");
     String8 valuefm;
     if (param.get(keyfm, valuefm) == NO_ERROR) {
@@ -205,10 +205,10 @@ status_t ALSAStreamOps::setParameters(const String8& keyValuePairs)
         // default action: fwd the kvp's to the module incase it wants to take action
         if (mParent->mALSADevice->set) {
            status = mParent->mALSADevice->set(keyValuePairs);
-           LOGI("setParameters() %s, %d", keyValuePairs.string(), (int)status);
+           ALOGI("setParameters() %s, %d", keyValuePairs.string(), (int)status);
            return status;
         } else {
-           LOGI("setParameters() :: BAD_VALUE");
+           ALOGI("setParameters() :: BAD_VALUE");
            return BAD_VALUE;
         }
     }
@@ -225,7 +225,7 @@ String8 ALSAStreamOps::getParameters(const String8& keys)
         param.addInt(key, (int)mHandle->curDev);
     }
 
-    LOGV("getParameters() %s", param.toString().string());
+    ALOGV("getParameters() %s", param.toString().string());
     return param.toString();
 }
 
@@ -249,7 +249,7 @@ size_t ALSAStreamOps::bufferSize() const
  //   for (size_t i = 1; (bytes & ~i) != 0; i<<=1)
  //       bytes &= ~i;
  //   bufferSize*=2;
-    LOGI("buffer size (bytes) to AF = %d", bytes);
+    ALOGI("buffer size (bytes) to AF = %d", bytes);
     return bytes;
 }
 
@@ -267,7 +267,7 @@ int ALSAStreamOps::format() const
             break;
 
         default:
-            LOG_FATAL("Unknown AudioSystem bit width %i!", pcmFormatBitWidth);
+            ALOG_FATAL("Unknown AudioSystem bit width %i!", pcmFormatBitWidth);
 
         case 16:
             audioSystemFormat = AudioSystem::PCM_16_BIT;
@@ -327,7 +327,7 @@ void ALSAStreamOps::close()
 //
 status_t ALSAStreamOps::open(int mode)
 {
-	LOGE("ALSAStreamOps Close");
+	ALOGE("ALSAStreamOps Close");
 
     return mParent->mALSADevice->open(mHandle, mHandle->curDev, mode);
 }

@@ -53,7 +53,7 @@ BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_CSR := true
 
 # Define egl.cfg location
-BOARD_EGL_CFG := device/hp/tenderloin/egl.cfg
+BOARD_EGL_CFG := device/hp/tenderloin/config/egl.cfg
 USE_OPENGL_RENDERER := true
 
 # QCOM HAL
@@ -70,6 +70,9 @@ TARGET_FORCE_CPU_UPLOAD := true
 
 # Enable WEBGL in WebKit
 ENABLE_WEBGL := true
+
+# Enable ICS-backwards compatibility
+COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB -DQCOM_ICS_COMPAT
 
 BOARD_USES_QCOM_LIBS := true
 BOARD_USES_QCOM_LIBRPC := true

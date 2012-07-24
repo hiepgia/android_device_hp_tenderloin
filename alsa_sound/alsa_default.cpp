@@ -328,7 +328,7 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	int avail_min = -1;
 	snd_pcm_uframes_t start_threshold, stop_threshold, chunk_size;
 
-	LOGI("Set global parms\n");
+	ALOGI("Set global parms\n");
 
 	usleep(1000);
 
@@ -336,7 +336,7 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	{
 		if(_defaultsIn.handle)
 		{
-			LOGE("Opening output device but input already running!");
+			ALOGE("Opening output device but input already running!");
 			handle->sampleRate = _defaultsIn.realsampleRate;
 		}
 	}
@@ -345,7 +345,7 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	{
 		if(_defaultsOut.handle)
 		{
-			LOGE("Opening input device but output already running!");
+			ALOGE("Opening input device but output already running!");
 			handle->sampleRate = _defaultsOut.realsampleRate;
 		}
 	}
@@ -357,11 +357,11 @@ status_t setGlobalParams(alsa_handle_t *handle)
 
 
 	if (err < 0) {
-		LOGE("Broken configuration for this PCM: no configurations available");
+		ALOGE("Broken configuration for this PCM: no configurations available");
 		return NO_INIT;
 	}
 	if (handle->mmap) {
-		LOGI("Setting mmap\n");
+		ALOGI("Setting mmap\n");
 
 		snd_pcm_access_mask_t *mask = (snd_pcm_access_mask_t*)alloca(snd_pcm_access_mask_sizeof());
 		snd_pcm_access_mask_none(mask);
@@ -371,13 +371,13 @@ status_t setGlobalParams(alsa_handle_t *handle)
 		err = snd_pcm_hw_params_set_access_mask(handle->handle, params, mask);
 	} else if (handle->interleaved)
 	{
-		LOGI("Setting interleved PCM\n");
+		ALOGI("Setting interleved PCM\n");
 		err = snd_pcm_hw_params_set_access(handle->handle, params,
 						   SND_PCM_ACCESS_RW_INTERLEAVED);
 	}	
 	else
 	{	
-		LOGI("Setting standard PCM");
+		ALOGI("Setting standard PCM");
 		snd_pcm_access_mask_t *mask = (snd_pcm_access_mask_t*)alloca(snd_pcm_access_mask_sizeof());
 		snd_pcm_access_mask_none(mask);
 		err = snd_pcm_hw_params_set_access_mask(handle->handle, params, mask);
@@ -385,18 +385,18 @@ status_t setGlobalParams(alsa_handle_t *handle)
 						   SND_PCM_ACCESS_RW_NONINTERLEAVED);
 	}
 	if (err < 0) {
-		LOGE("Access type not available");
+		ALOGE("Access type not available");
 		return NO_INIT;
 	}
 	err = snd_pcm_hw_params_set_format(handle->handle, params, handle->format);
 	if (err < 0) {
-		LOGE("Sample format non available");
+		ALOGE("Sample format non available");
 		//show_available_sample_formats(params);
 		return NO_INIT;
 	}
 	err = snd_pcm_hw_params_set_channels(handle->handle, params, handle->channels);
 	if (err < 0) {
-		LOGE("Channels count non available");
+		ALOGE("Channels count non available");
 		return NO_INIT;
 	}
 
@@ -411,14 +411,14 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	{
 		char plugex[64];
 		const char *pcmname = snd_pcm_name(handle->handle);
-		LOGE("Warning: rate is not accurate (requested = %iHz, got = %iHz)\n", rate, handle->sampleRate);
+		ALOGE("Warning: rate is not accurate (requested = %iHz, got = %iHz)\n", rate, handle->sampleRate);
 		if (! pcmname || strchr(snd_pcm_name(handle->handle), ':'))
 			*plugex = 0;
 		else
 	
 			snprintf(plugex, sizeof(plugex), "(-Dplug:%s)",
 					 snd_pcm_name(handle->handle));
-		LOGE("         please, try the plug plugin %s\n",
+		ALOGE("         please, try the plug plugin %s\n",
 			plugex);
 	}
 	rate = handle->sampleRate;
@@ -456,13 +456,13 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	can_pause = snd_pcm_hw_params_can_pause(params);
 	err = snd_pcm_hw_params(handle->handle, params);
 	if (err < 0) {
-		LOGE("Unable to install hw params:");
+		ALOGE("Unable to install hw params:");
 		return NO_INIT;
 	}
 	snd_pcm_hw_params_get_period_size(params, &chunk_size, 0);
 	snd_pcm_hw_params_get_buffer_size(params, (snd_pcm_uframes_t*)&handle->bufferSize);
 	if (chunk_size == handle->bufferSize) {
-		LOGE("Can't use period equal to buffer size (%lu == %lu)",
+		ALOGE("Can't use period equal to buffer size (%lu == %lu)",
 		      chunk_size, handle->bufferSize);
 		return NO_INIT;
 	}
@@ -494,7 +494,7 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	assert(err >= 0);
 
 	if (snd_pcm_sw_params(handle->handle, swparams) < 0) {
-		LOGE("unable to install sw params:");
+		ALOGE("unable to install sw params:");
 		return NO_INIT;
 	}
 
@@ -502,11 +502,11 @@ status_t setGlobalParams(alsa_handle_t *handle)
 	bits_per_frame = bits_per_sample * handle->channels;
 	handle->chunk_bytes = chunk_size * bits_per_frame / 8;
 
-	LOGI("Buffer size: %lu, chunk %d, latency %d", handle->bufferSize, handle->chunk_bytes, handle->latency);
+	ALOGI("Buffer size: %lu, chunk %d, latency %d", handle->bufferSize, handle->chunk_bytes, handle->latency);
 
 /*	audiobuf = realloc(audiobuf, chunk_bytes);
 	if (audiobuf == NULL) {
-		LOGE("not enough memory");
+		ALOGE("not enough memory");
 		return NO_INIT;
 	}*/
 	// fprintf(stderr, "real chunk_size = %i, frags = %i, total = %i\n", chunk_size, setup.buf.block.frags, setup.buf.block.frags * chunk_size);
@@ -518,11 +518,11 @@ status_t setGlobalParams(alsa_handle_t *handle)
 		int i;
 		err = snd_pcm_mmap_begin(handle->handle, &areas, &offset, &size);
 		if (err < 0) {
-			LOGE("snd_pcm_mmap_begin problem: %s", snd_strerror(err));
+			ALOGE("snd_pcm_mmap_begin problem: %s", snd_strerror(err));
 			return NO_INIT;
 		}
 		for (i = 0; i < handle->channels; i++)
-			LOGI("mmap_area[%i] = %p,%u,%u (%u)\n", i, areas[i].addr, areas[i].first, areas[i].step, snd_pcm_format_physical_width(handle->format));
+			ALOGI("mmap_area[%i] = %p,%u,%u (%u)\n", i, areas[i].addr, areas[i].first, areas[i].step, snd_pcm_format_physical_width(handle->format));
 		/* not required, but for sure */
 		snd_pcm_mmap_commit(handle->handle, offset, 0);
 	}
@@ -539,7 +539,7 @@ void* headphone_thread(void*)
 {
     int fd = open("/dev/input/event5", O_RDONLY);
     if (fd <= 0) {
-        LOGE("Error opening event file for headphone detection");
+        ALOGE("Error opening event file for headphone detection");
         return 0;
     }
     struct input_event ev;
@@ -551,14 +551,14 @@ void* headphone_thread(void*)
         if(ev.type == 5) {
 	        if(ev.value)
             {
-                LOGI("Headphones enabled");
+                ALOGI("Headphones enabled");
                 write_elem(dsp.fd,dsp.outvol_id,0x75,0x75,0);
                 write_elem(dsp.fd, dsp.line1outn_id, 0, 0, 0);
                 write_elem(dsp.fd, dsp.line1outp_id, 0, 0, 0);
                 write_elem(dsp.fd, dsp.line2outn_id, 0, 0, 0);
                 write_elem(dsp.fd, dsp.line2outp_id, 0, 0, 0);
             } else {
-                LOGI("Headphones disabled");
+                ALOGI("Headphones disabled");
                 write_elem(dsp.fd, dsp.line1outn_id, 1, 1, 1);
                 write_elem(dsp.fd, dsp.line1outp_id, 1, 1, 1);
                 write_elem(dsp.fd, dsp.line2outn_id, 1, 1, 1);
@@ -599,7 +599,7 @@ static status_t s_init(alsa_device_t *module, ALSAHandleList &list)
 
     dsp.fd = open("/dev/snd/controlC0", O_RDONLY);
     if(dsp.fd <=0) {
-        LOGE("Unable to open sound device for init");
+        ALOGE("Unable to open sound device for init");
         exit(-1);
     }
 #ifdef IDLE_CONTROL
@@ -610,13 +610,13 @@ static status_t s_init(alsa_device_t *module, ALSAHandleList &list)
 
     //Ignore open errors
     if(idle0_collapse_fd <= 0)
-        LOGE("Unable to open cpu0/power_collapse/idle_enabled");
+        ALOGE("Unable to open cpu0/power_collapse/idle_enabled");
     if(idle0_standalone_fd <= 0)
-        LOGE("Unable to open cpu0/standalone_power_collapse/idle_enabled");
+        ALOGE("Unable to open cpu0/standalone_power_collapse/idle_enabled");
     if(idle1_collapse_fd <= 0)
-        LOGE("Unable to open cpu1/power_collapse/idle_enabled");
+        ALOGE("Unable to open cpu1/power_collapse/idle_enabled");
     if(idle1_standalone_fd <= 0)
-        LOGE("Unable to open cpu1/standalone_power_collapse/idle_enabled");
+        ALOGE("Unable to open cpu1/standalone_power_collapse/idle_enabled");
 #endif
     elem_list.offset = 0;
     elem_list.space  = 300;
@@ -720,7 +720,7 @@ static status_t s_open(alsa_handle_t *handle, uint32_t devices, int mode)
 
  /*	if (handle->handle && handle->curDev == devices && handle->curMode == mode) 
 	{
-		LOGI("ALSA Module called open on already open device %08x in mode %d...", devices, mode); 
+		ALOGI("ALSA Module called open on already open device %08x in mode %d...", devices, mode); 
 		return NO_ERROR;	
 	}*/
     // Close off previously opened device.
@@ -742,25 +742,25 @@ static status_t s_open(alsa_handle_t *handle, uint32_t devices, int mode)
     if(idle0_standalone_fd > 0) {
         int bytes = 0;
         bytes = write(idle0_standalone_fd, "0", 1);
-        LOGI("Disable: Bytes written to standalone idle0_enabled: %d\n", bytes);
+        ALOGI("Disable: Bytes written to standalone idle0_enabled: %d\n", bytes);
     }
     if(idle0_collapse_fd > 0) {
         int bytes = 0;
         bytes = write(idle0_collapse_fd, "0", 1);
-        LOGI("Disable: Bytes written to collapse idle0_enabled: %d\n", bytes);
+        ALOGI("Disable: Bytes written to collapse idle0_enabled: %d\n", bytes);
     }
     if(idle1_standalone_fd > 0) {
         int bytes = 0;
         bytes = write(idle1_standalone_fd, "0", 1);
-        LOGI("Disable: Bytes written to standalone idle1_enabled: %d\n", bytes);
+        ALOGI("Disable: Bytes written to standalone idle1_enabled: %d\n", bytes);
     }
     if(idle1_collapse_fd > 0) {
         int bytes = 0;
         bytes = write(idle1_collapse_fd, "0", 1);
-        LOGI("Disable: Bytes written to collapse idle1_enabled: %d\n", bytes);
+        ALOGI("Disable: Bytes written to collapse idle1_enabled: %d\n", bytes);
     }
 #endif
-    LOGD("open called for devices %08x in mode %d...", devices, mode);
+    ALOGD("open called for devices %08x in mode %d...", devices, mode);
 
     const char *stream = streamName(handle);
     const char *devName = deviceName(handle, devices, mode);
@@ -789,7 +789,7 @@ static status_t s_open(alsa_handle_t *handle, uint32_t devices, int mode)
     }
 
     if (err < 0) {
-        LOGE("Failed to Initialize any ALSA %s device: %s",
+        ALOGE("Failed to Initialize any ALSA %s device: %s",
                 stream, strerror(err));
         return NO_INIT;
     }
@@ -800,7 +800,7 @@ static status_t s_open(alsa_handle_t *handle, uint32_t devices, int mode)
     if (err == NO_ERROR) err = setSoftwareParams(handle); */
     setGlobalParams(handle);
 
-    LOGI("Initialized ALSA %s device %s", stream, devName);
+    ALOGI("Initialized ALSA %s device %s", stream, devName);
 
     handle->curDev = devices;
     handle->curMode = mode;
@@ -833,29 +833,29 @@ static status_t s_close(alsa_handle_t *handle)
         if(idle0_standalone_fd > 0) {
             int bytes = 0;
             bytes = write(idle0_standalone_fd, "1", 1);
-            LOGI("Enabled: Bytes written to standalone idle0_enabled: %d\n", bytes);
+            ALOGI("Enabled: Bytes written to standalone idle0_enabled: %d\n", bytes);
         }
         if(idle0_collapse_fd > 0) {
             int bytes = 0;
             bytes = write(idle0_collapse_fd, "1", 1);
-            LOGI("Enabled: Bytes written to collapse idle0_enabled: %d\n", bytes);
+            ALOGI("Enabled: Bytes written to collapse idle0_enabled: %d\n", bytes);
         }
         if(idle1_standalone_fd > 0) {
             int bytes = 0;
             bytes = write(idle1_standalone_fd, "1", 1);
-            LOGI("Enabled: Bytes written to standalone idle1_enabled: %d\n", bytes);
+            ALOGI("Enabled: Bytes written to standalone idle1_enabled: %d\n", bytes);
         }
         if(idle1_collapse_fd > 0) {
             int bytes = 0;
             bytes = write(idle1_collapse_fd, "1", 1);
-            LOGI("Enabled: Bytes written to collapse idle1_enabled: %d\n", bytes);
+            ALOGI("Enabled: Bytes written to collapse idle1_enabled: %d\n", bytes);
         }
     }
 #endif
     if(handle == &_defaultsIn)
-        LOGI("ALSA Module: closing down input device");
+        ALOGI("ALSA Module: closing down input device");
     if(handle == &_defaultsOut)
-        LOGI("ALSA Module: closing down output device");
+        ALOGI("ALSA Module: closing down output device");
 
     return err;
 }
@@ -873,7 +873,7 @@ static status_t s_standby(alsa_handle_t *handle)
 
 static status_t s_route(alsa_handle_t *handle, uint32_t devices, int mode)
 {
-    LOGD("route called for devices %08x in mode %d...", devices, mode);
+    ALOGD("route called for devices %08x in mode %d...", devices, mode);
 
     if (handle->handle && handle->curDev == devices && handle->curMode == mode) return NO_ERROR;
 
@@ -883,9 +883,9 @@ static status_t s_route(alsa_handle_t *handle, uint32_t devices, int mode)
 static status_t s_resetDefaults(alsa_handle_t *handle)
 {
 	if(handle == &_defaultsIn)
-		LOGE("Reset defaults called on input");
+		ALOGE("Reset defaults called on input");
 	if(handle == &_defaultsOut)
-		LOGE("Reset defaults called on output");
+		ALOGE("Reset defaults called on output");
 	return NO_ERROR;
 }
 

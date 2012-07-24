@@ -27,13 +27,13 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
                                                   const char *device_address)
 {
 
-    LOGV("setDeviceConnectionState() device: %x, state %d, address %s", device, state, device_address);
+    ALOGV("setDeviceConnectionState() device: %x, state %d, address %s", device, state, device_address);
 
     // connect/disconnect only 1 device at a time
     if (AudioSystem::popCount(device) != 1) return BAD_VALUE;
 
     if (strlen(device_address) >= MAX_DEVICE_ADDRESS_LEN) {
-        LOGE("setDeviceConnectionState() invalid address: %s", device_address);
+        ALOGE("setDeviceConnectionState() invalid address: %s", device_address);
         return BAD_VALUE;
     }
 
@@ -42,7 +42,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
 
 #ifndef WITH_A2DP
         if (AudioSystem::isA2dpDevice(device)) {
-            LOGE("setDeviceConnectionState() invalid device: %x", device);
+            ALOGE("setDeviceConnectionState() invalid device: %x", device);
             return BAD_VALUE;
         }
 #endif
@@ -52,10 +52,10 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
         // handle output device connection
         case AudioSystem::DEVICE_STATE_AVAILABLE:
             if (mAvailableOutputDevices & device) {
-                LOGW("setDeviceConnectionState() device already connected: %x", device);
+                ALOGW("setDeviceConnectionState() device already connected: %x", device);
                 return INVALID_OPERATION;
             }
-            LOGV("setDeviceConnectionState() connecting device %x", device);
+            ALOGV("setDeviceConnectionState() connecting device %x", device);
 
             // register new device as available
             mAvailableOutputDevices |= device;
@@ -72,7 +72,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
 #endif
             {
                 if (AudioSystem::isBluetoothScoDevice(device)) {
-                    LOGV("setDeviceConnectionState() BT SCO  device, address %s", device_address);
+                    ALOGV("setDeviceConnectionState() BT SCO  device, address %s", device_address);
                     // keep track of SCO device address
                     mScoDeviceAddress = String8(device_address, MAX_DEVICE_ADDRESS_LEN);
 #ifdef WITH_A2DP
@@ -87,12 +87,12 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
         // handle output device disconnection
         case AudioSystem::DEVICE_STATE_UNAVAILABLE: {
             if (!(mAvailableOutputDevices & device)) {
-                LOGW("setDeviceConnectionState() device not connected: %x", device);
+                ALOGW("setDeviceConnectionState() device not connected: %x", device);
                 return INVALID_OPERATION;
             }
 
 
-            LOGV("setDeviceConnectionState() disconnecting device %x", device);
+            ALOGV("setDeviceConnectionState() disconnecting device %x", device);
             // remove device from available output devices
             mAvailableOutputDevices &= ~device;
 
@@ -120,7 +120,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
             } break;
 
         default:
-            LOGE("setDeviceConnectionState() invalid state: %x", state);
+            ALOGE("setDeviceConnectionState() invalid state: %x", state);
             return BAD_VALUE;
         }
 
@@ -159,7 +159,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
         // handle input device connection
         case AudioSystem::DEVICE_STATE_AVAILABLE: {
             if (mAvailableInputDevices & device) {
-                LOGW("setDeviceConnectionState() device already connected: %d", device);
+                ALOGW("setDeviceConnectionState() device already connected: %d", device);
                 return INVALID_OPERATION;
             }
             mAvailableInputDevices |= device;
@@ -169,14 +169,14 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
         // handle input device disconnection
         case AudioSystem::DEVICE_STATE_UNAVAILABLE: {
             if (!(mAvailableInputDevices & device)) {
-                LOGW("setDeviceConnectionState() device not connected: %d", device);
+                ALOGW("setDeviceConnectionState() device not connected: %d", device);
                 return INVALID_OPERATION;
             }
             mAvailableInputDevices &= ~device;
             } break;
 
         default:
-            LOGE("setDeviceConnectionState() invalid state: %x", state);
+            ALOGE("setDeviceConnectionState() invalid state: %x", state);
             return BAD_VALUE;
         }
 
@@ -185,7 +185,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
             AudioInputDescriptor *inputDesc = mInputs.valueFor(activeInput);
             uint32_t newDevice = getDeviceForInputSource(inputDesc->mInputSource);
             if (newDevice != inputDesc->mDevice) {
-                LOGV("setDeviceConnectionState() changing device from %x to %x for input %d",
+                ALOGV("setDeviceConnectionState() changing device from %x to %x for input %d",
                         inputDesc->mDevice, newDevice, activeInput);
                 inputDesc->mDevice = newDevice;
                 AudioParameter param = AudioParameter();
@@ -215,7 +215,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
                    /* Forcely open the current output device again for
                     * FM Rx playback path to open
                     */
-                    LOGV("curOutdevice = %x",curOutdevice);
+                    ALOGV("curOutdevice = %x",curOutdevice);
                     setOutputDevice(mHardwareOutput, curOutdevice, true);
 
                    /* Tell the audio flinger playback thread that
@@ -251,7 +251,7 @@ status_t AudioPolicyManagerALSA::setDeviceConnectionState(AudioSystem::audio_dev
         return NO_ERROR;
     }
 
-    LOGW("setDeviceConnectionState() invalid device: %x", device);
+    ALOGW("setDeviceConnectionState() invalid device: %x", device);
     return BAD_VALUE;
 }
 
@@ -260,7 +260,7 @@ uint32_t AudioPolicyManagerALSA::getDeviceForStrategy(routing_strategy strategy,
     uint32_t device = 0;
 
     if (fromCache) {
-      LOGV("getDeviceForStrategy() from cache strategy %d, device %x", strategy, mDeviceForStrategy[strategy]);
+      ALOGV("getDeviceForStrategy() from cache strategy %d, device %x", strategy, mDeviceForStrategy[strategy]);
       return mDeviceForStrategy[strategy];
     }
 
@@ -305,7 +305,7 @@ uint32_t AudioPolicyManagerALSA::getDeviceForStrategy(routing_strategy strategy,
 #endif
               device = mAvailableOutputDevices & AudioSystem::DEVICE_OUT_EARPIECE;
               if (device == 0) {
-                  LOGE("getDeviceForStrategy() earpiece device not found");
+                  ALOGE("getDeviceForStrategy() earpiece device not found");
               }
               break;
 
@@ -324,7 +324,7 @@ uint32_t AudioPolicyManagerALSA::getDeviceForStrategy(routing_strategy strategy,
 #endif
               device = mAvailableOutputDevices & AudioSystem::DEVICE_OUT_SPEAKER;
               if (device == 0) {
-                   LOGE("getDeviceForStrategy() speaker device not found");
+                   ALOGE("getDeviceForStrategy() speaker device not found");
               }
               break;
            }
@@ -340,7 +340,7 @@ uint32_t AudioPolicyManagerALSA::getDeviceForStrategy(routing_strategy strategy,
               }
               device = mAvailableOutputDevices & AudioSystem::DEVICE_OUT_SPEAKER;
               if (device == 0) {
-                  LOGE("getDeviceForStrategy() speaker device not found");
+                  ALOGE("getDeviceForStrategy() speaker device not found");
               }
              // The second device used for sonification is the same as the device used by media strategy
              // FALL THROUGH
@@ -394,16 +394,16 @@ uint32_t AudioPolicyManagerALSA::getDeviceForStrategy(routing_strategy strategy,
             // device is DEVICE_OUT_SPEAKER if we come from case STRATEGY_SONIFICATION, 0 otherwise
             device |= device2;
             if (device == 0) {
-                 LOGE("getDeviceForStrategy() speaker device not found");
+                 ALOGE("getDeviceForStrategy() speaker device not found");
             }
             } break;
 
          default:
-            LOGW("getDeviceForStrategy() unknown strategy: %d", strategy);
+            ALOGW("getDeviceForStrategy() unknown strategy: %d", strategy);
               break;
          }
 
-         LOGV("getDeviceForStrategy() strategy %d, device %x", strategy, device);
+         ALOGV("getDeviceForStrategy() strategy %d, device %x", strategy, device);
          return device;
 }
 #ifdef HAS_FM_RADIO
@@ -423,7 +423,7 @@ audio_io_handle_t AudioPolicyManagerALSA::getFMInput(int inputSource,
          return 0;
     }
 
-    LOGV("getFMInput() inputSource %d, samplingRate %d, format %d, channels %x, acoustics %x", inputSource, samplingRate, format, channels, acoustics);
+    ALOGV("getFMInput() inputSource %d, samplingRate %d, format %d, channels %x, acoustics %x", inputSource, samplingRate, format, channels, acoustics);
 
 
     AudioInputDescriptor *inputDesc = new AudioInputDescriptor();
@@ -446,7 +446,7 @@ audio_io_handle_t AudioPolicyManagerALSA::getFMInput(int inputSource,
         (samplingRate != inputDesc->mSamplingRate) ||
         (format != inputDesc->mFormat) ||
         (channels != inputDesc->mChannels)) {
-        LOGV("getInput() failed opening input: samplingRate %d, format %d, channels %d",
+        ALOGV("getInput() failed opening input: samplingRate %d, format %d, channels %d",
                 samplingRate, format, channels);
         if (input != 0) {
             mpClientInterface->closeInput(input);
@@ -461,10 +461,10 @@ audio_io_handle_t AudioPolicyManagerALSA::getFMInput(int inputSource,
 
 status_t AudioPolicyManagerALSA::stopOutput(audio_io_handle_t output, AudioSystem::stream_type stream)
 {
-        LOGV("stopOutput() output %d, stream %d", output, stream);
+        ALOGV("stopOutput() output %d, stream %d", output, stream);
         ssize_t index = mOutputs.indexOfKey(output);
         if (index < 0) {
-        LOGW("stopOutput() unknow output %d", output);
+        ALOGW("stopOutput() unknow output %d", output);
         return BAD_VALUE;
         }
         AudioOutputDescriptor *outputDesc = mOutputs.valueAt(index);
@@ -505,7 +505,7 @@ status_t AudioPolicyManagerALSA::stopOutput(audio_io_handle_t output, AudioSyste
            }
            return NO_ERROR;
            } else {
-              LOGW("stopOutput() refcount is already 0 for output %d", output);
+              ALOGW("stopOutput() refcount is already 0 for output %d", output);
               return INVALID_OPERATION;
        }
 }

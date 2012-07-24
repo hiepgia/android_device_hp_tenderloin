@@ -96,7 +96,7 @@ ssize_t AudioStreamOutALSA::write(const void *buffer, size_t bytes)
 
             mHandle->module->open(mHandle, mHandle->curDev, mHandle->curMode);
         nsecs_t delta = systemTime() - previously;
-        LOGE("RE-OPEN AFTER STANDBY:: took %llu msecs\n", ns2ms(delta));
+        ALOGE("RE-OPEN AFTER STANDBY:: took %llu msecs\n", ns2ms(delta));
        }
 
    acoustic_device_t *aDev = acoustics();
@@ -116,14 +116,14 @@ ssize_t AudioStreamOutALSA::write(const void *buffer, size_t bytes)
                    return sent;
 
        if (mHandle->mmap) {
-               LOGE("Tried to write MMAP Stream!");
+               ALOGE("Tried to write MMAP Stream!");
 /*            n = snd_pcm_mmap_writei(mHandle->handle,
                                   (char *)buffer + sent,
 
 snd_pcm_bytes_to_frames(mHandle->handle, bytes - sent));*/
        }
        else {
-  //    LOGE("waiting for send");
+  //    ALOGE("waiting for send");
                int to_write = snd_pcm_bytes_to_frames(mHandle->handle, bytes - sent);
 		int n_frames = to_write;
                int chunk_frames =  snd_pcm_bytes_to_frames(mHandle->handle, mHandle->chunk_bytes);
@@ -141,10 +141,10 @@ snd_pcm_bytes_to_frames(mHandle->handle, bytes - sent));*/
 
        //    n = snd_pcm_bytes_to_frames(mHandle->handle, bytes - sent);
 
-   //   LOGE("would have sent %d frames, chunk %d, done %d", n_frames, chunk_frames, n);
+   //   ALOGE("would have sent %d frames, chunk %d, done %d", n_frames, chunk_frames, n);
        }
        if (n == -EBADFD) {
-		LOGE("bad fd");
+		ALOGE("bad fd");
            // Somehow the stream is in a bad state. The driver probably
            // has a bug and snd_pcm_recover() doesn't seem to handle this.
            mHandle->module->open(mHandle, mHandle->curDev, mHandle->curMode);
