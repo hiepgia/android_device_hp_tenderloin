@@ -184,7 +184,7 @@ PRODUCT_COPY_FILES += \
     device/hp/tenderloin/prebuilt/wifi/cfg80211.ko:system/lib/modules/cfg80211.ko \
     device/hp/tenderloin/prebuilt/wifi/mac80211.ko:system/lib/modules/mac80211.ko \
     device/hp/tenderloin/prebuilt/wifi/compat.ko:system/lib/modules/compat.ko \
-    device/hp/tenderloin/prebuilt/wifi/sch_codel.ko:system/lib/modules/sch_codel.ko
+    device/hp/tenderloin/prebuilt/wifi/sch_codel.ko:system/lib/modules/sch_codel.ko \
     device/hp/tenderloin/prebuilt/wifi/sch_fq_codel.ko:system/lib/modules/sch_fw_codel.ko
 
 #Wifi Firmware
@@ -229,7 +229,7 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 # device uses high-density artwork where available
 PRODUCT_LOCALES += en_US mdpi
 
-PRODUCT_COPY_FILES += 
+PRODUCT_COPY_FILES +=  \
     device/hp/tenderloin/vold.fstab:system/etc/vold.fstab \
     device/hp/tenderloin/makemulti.sh:makemulti.sh \
     device/hp/tenderloin/prebuilt/boot/moboot.splash.CyanogenMod.tga:moboot.splash.CyanogenMod.tga
