@@ -53,7 +53,7 @@ BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_CSR := true
 
 # Define egl.cfg location
-BOARD_EGL_CFG := device/hp/tenderloin/config/egl.cfg
+BOARD_EGL_CFG := device/hp/tenderloin/configs/egl.cfg
 USE_OPENGL_RENDERER := true
 
 # QCOM HAL
