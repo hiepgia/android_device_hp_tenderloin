@@ -87,12 +87,12 @@ PRODUCT_PACKAGES += \
     libQcomUI
 
 # QCOM OMX
-PRODUCT_PACKAGES += \
-	libstagefrighthw \
-	libOmxCore \
-	libmm-omxcore \
-	libdivxdrmdecrypt \
-	libOmxVdec
+#PRODUCT_PACKAGES += \
+#	libstagefrighthw \
+#	libOmxCore \
+#	libmm-omxcore \
+#	libdivxdrmdecrypt \
+#	libOmxVdec
 
 # QCOM OMX Video Encoding/Tests
 #PRODUCT_PACKAGES += \
