@@ -18,7 +18,7 @@ import sys
 import os
 import tenderloin_common as common
 
-
+print("1")
 LOCAL_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 RELEASETOOLS_DIR = os.path.abspath(os.path.join(LOCAL_DIR, '../../../build/tools/releasetools'))
 
@@ -29,12 +29,12 @@ sys.path.append(RELEASETOOLS_DIR)
 # This is a nasty hack as the filename doesn't end in .py, but it works
 filename = os.path.join(RELEASETOOLS_DIR, "ota_from_target_files")
 ota_from_target_files = common.load_module_from_file('ota_from_target_files', filename)
-
+print("2")
 from ota_from_target_files import *
 import tenderloin_edify_generator as edify_generator
 
 __doc__ = ota_from_target_files.__doc__
-
+print("3")
 def WriteFullOTAPackage(input_zip, output_zip):
   # TODO: how to determine this?  We don't know what version it will
   # be installed on top of.  For now, we expect the API just won't
@@ -73,10 +73,10 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.Mount("/system")
   script.UnpackPackageDir("recovery", "/system")
   script.UnpackPackageDir("system", "/system")
-
+print("4")
   symlinks = CopySystemFiles(input_zip, output_zip)
   script.MakeSymlinks(symlinks)
-
+print("5")
   # -- tenderloin build change starting
   #boot_img = common.File("boot.img", common.BuildBootableImage(
   #    os.path.join(OPTIONS.input_tmp, "BOOT")))
