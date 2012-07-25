@@ -77,7 +77,7 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.UnpackPackageDir("system", "/system")
 
   symlinks = CopySystemFiles(input_zip, output_zip)
-
+  script.MakeSymlinks(symlinks)
   # -- tenderloin build change starting
   #boot_img = common.File("boot.img", common.BuildBootableImage(
   #    os.path.join(OPTIONS.input_tmp, "BOOT")))
